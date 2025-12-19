@@ -1,0 +1,2 @@
+# GDlite
+Realtime docs editor
