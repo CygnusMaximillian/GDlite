@@ -1,11 +1,13 @@
 const express = require('express');
 const documentRouter = require('./routes/documents');
+const authRouter = require('./routes/authRoute');
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
 const app = express();
 
 app.use(express.json());
 app.use('/document' , documentRouter);
+app.use('/api/auth' , authRouter);
 app.get('/document' , () => {
   console.log('Server is running');
 } );
