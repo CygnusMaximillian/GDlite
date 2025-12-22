@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
-const auth = (req, res, next) => {
+const auth = async (req, res, next) => {
   // 1️⃣ Get the Authorization header
   const authHeader = req.headers.authorization;
 
@@ -18,7 +18,12 @@ const auth = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
 
     // 5️⃣ Attach user info to request
-    req.user = decoded;
+    const user = await pool.query(
+      'SELECT id, email FROM users WHERE id = $1',
+      [decoded.userId]
+    );
+
+    req.user = user.rows[0];
 
     // 6️⃣ Allow request to continue
     next();
