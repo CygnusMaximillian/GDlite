@@ -20,7 +20,7 @@ exports.createDocument = async (req , res) => {
 
 exports.getDocumentId = async (req , res) => {
   try{
-    const {id} = req.params;
+    const id = parseInt(req.params.id, 10);
 
     const result = await pool.query(
       `SELECT * FROM documents WHERE id = $1` , [id] 
@@ -41,3 +41,51 @@ exports.getDocumentId = async (req , res) => {
     res.status(500).json({ "error" : "failed to get id"});
   }
 }
+
+exports.updateDocument = async (req, res) => {
+  try {
+    const {id} = req.params;
+    const {content, version } = req.body;
+    const userId = parseInt(req.user.id); // set by auth middleware
+    console.log("the ID : ", id , "UserID" , userId);
+    // 1. Fetch current document
+    const result = await pool.query(
+      `SELECT version FROM documents 
+       WHERE id = $1 AND owner_id = $2`,
+      [id, userId]
+    );
+
+    // 2. If document not found or not owned
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    const currentVersion = result.rows[0].version;
+
+    // 3. Version check (conflict detection)
+    if (version !== currentVersion + 1) {
+      return res.status(409).json({
+        message: "Version conflict",
+        currentVersion
+      });
+    }
+
+    // 4. Update document
+    await pool.query(
+      `UPDATE documents 
+       SET content = $1, version = $2 
+       WHERE id = $3 AND owner_id = $4`,
+      [content, version, id, userId]
+    );
+
+    // 5. Success response
+    res.status(200).json({
+      message: "Document updated successfully",
+      version
+    });
+
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

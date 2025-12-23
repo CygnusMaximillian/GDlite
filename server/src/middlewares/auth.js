@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const pool = require('../db')
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
 const auth = async (req, res, next) => {
@@ -16,7 +17,7 @@ const auth = async (req, res, next) => {
   // 4️⃣ Verify token
   try {
     const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
-
+    console.log("The decoded info ;", decoded);
     // 5️⃣ Attach user info to request
     const user = await pool.query(
       'SELECT id, email FROM users WHERE id = $1',
@@ -24,11 +25,13 @@ const auth = async (req, res, next) => {
     );
 
     req.user = user.rows[0];
+    console.log("the user Info " , req.user);
 
     // 6️⃣ Allow request to continue
     next();
   } catch (err) {
-    return res.status(401).json({ message: "Invalid or expired token" });
+    res.status(401).json({ message: "Invalid or expired token" });
+    console.log("this is the error :  " , err);
   }
 };
 

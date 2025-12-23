@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const {auth} = require('../middlewares/auth');
 
-const {createDocument , getDocumentId} = require('../controllers/documentController');
+const {createDocument , getDocumentId , updateDocument} = require('../controllers/documentController');
 
-router.post('/' ,auth,createDocument);
-router.get('/:id' ,auth,getDocumentId);
+router.post('/' ,auth ,createDocument);
+router.get('/:id' ,auth ,getDocumentId);
+router.put('/:id',auth , updateDocument);
 
 module.exports = router;

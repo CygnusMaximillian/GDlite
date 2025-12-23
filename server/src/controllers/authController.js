@@ -38,39 +38,48 @@ const register = async (req, res) => {
     res.status(201).json({ token, user });
   } catch (err) {
     console.error(err.message);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 
 
-const login = async (req , res) => {
-  try{
-    const {email , password} = req.body;
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-    const existingUser = pool.query(
-      'SELECT (email, password_hash) FROM users WHERE email = $1',
+    const existingUser = await pool.query(
+      'SELECT id,email, password_hash FROM users WHERE email = $1',
       [email]
     );
 
-    if(existingUser.rows.length == 0) {
-      res.status(400).json({message : 'User Not Found'})
+    if (existingUser.rows.length === 0) {
+      return res.status(400).json({ message: 'User Not Found' });
     }
 
     const user = existingUser.rows[0];
-    const compare = bcrypt.compare(password , user.password_hash);
 
-    if(!compare) {
-      res.status(400).json({message : 'Invalid Credentials'})
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid Credentials' });
     }
 
-    const token = jwt.sign({userId : user.id }, process.env.PRIVATE_KEY, {expiresIn : '1h'});
-    res.status(201).json({token , user});
+    const token = jwt.sign(
+      { userId: user.id },
+      process.env.PRIVATE_KEY,
+      { expiresIn: '1h' }
+    );
 
+    return res.status(200).json({
+      token,
+      user
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'There is some unknown error' });
   }
-  catch(err){
-    res.status(500).json({message : 'there is some unkown error'});
-    console.log("error cropped up" , err);
-  }
-}
+};
+
 
 module.exports = { register, login };
