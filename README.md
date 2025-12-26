@@ -118,3 +118,33 @@ Database pool manages PostgreSQL connections
 
 JWT tokens secure API requests
 
+React Router manages client-side navigation
+
+🔮 Planned Improvements
+
+🔄 WebSocket-based real-time editing
+
+👥 Multi-user cursors & presence
+
+📜 Document versioning
+
+🛡️ Role-based access control
+
+🚀 Production deployment (Docker + Nginx)
+
+🧪 Common Issues
+
+Blank page in frontend → Check App.jsx, routes, and exports
+
+Postgres connection errors → Verify password & .env loading
+
+Vite import errors → Ensure dependencies are installed
+
+📜 License
+
+This project is licensed under the MIT License.
+
+👨‍💻 Author
+
+Prajjwal Dwivedi
+📌 Full-Stack Developer | Systems & Backend Enthusiast
