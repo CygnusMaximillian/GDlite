@@ -5,7 +5,7 @@ const {auth} = require('../middlewares/auth');
 const {createDocument , getDocumentId , updateDocument} = require('../controllers/documentController');
 
 router.post('/' ,auth ,createDocument);
-router.get('/:id' ,auth ,getDocumentId);
+router.post('/:id' ,auth ,getDocumentId);
 router.put('/:id',auth , updateDocument);
 
 module.exports = router;

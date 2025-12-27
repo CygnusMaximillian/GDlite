@@ -1,4 +1,4 @@
-export function IsAuthenticated(){
+export function isAuthenticated(){
   return !!localStorage.getItem("token");
 }
 

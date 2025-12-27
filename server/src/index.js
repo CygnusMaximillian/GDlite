@@ -1,10 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 const documentRouter = require('./routes/documents');
 const authRouter = require('./routes/authRoute');
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
 const app = express();
-
+app.use(cors());
 app.use(express.json());
 app.use('/document' , documentRouter);
 app.use('/api/auth' , authRouter);

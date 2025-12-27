@@ -13,7 +13,7 @@ export default function Editor() {
   useEffect(() => {
     async function loadDocument() {
       try {
-        const data = await apiRequest(`/documents/${id}`);
+        const data = await apiRequest(`/document/${id}`,"GET");
         setContent(data.content);
         setVersion(data.version);
       } catch (err) {
@@ -27,13 +27,12 @@ export default function Editor() {
   async function handleSave() {
     setIsSaving(true);
     setError("");
-
     try {
-      const data = await apiRequest(`/documents/${id}`, "PUT", {
+      const data = await apiRequest(`/document/${id}`, "PUT", {
         content,
         version,
       });
-
+      console.log("data version is " , data.version);
       setContent(data.content);
       setVersion(data.version);
     } catch (err) {

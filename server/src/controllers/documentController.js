@@ -23,11 +23,8 @@ exports.getDocumentId = async (req , res) => {
     const id = parseInt(req.params.id, 10);
 
     const result = await pool.query(
-      `SELECT * FROM documents WHERE id = $1` , [id] 
+      `SELECT * FROM documents WHERE owner_id = $1` , [id] 
     );
-    console.log('id from params:', req.params.id, typeof req.params.id);
-
-    console.log('Query result:', result);
     
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Document not found' });
@@ -63,25 +60,26 @@ exports.updateDocument = async (req, res) => {
     const currentVersion = result.rows[0].version;
 
     // 3. Version check (conflict detection)
-    if (version !== currentVersion + 1) {
+    if (version !== currentVersion ) {
       return res.status(409).json({
         message: "Version conflict",
         currentVersion
       });
     }
 
+    const newVersion = version + 1;
     // 4. Update document
     await pool.query(
       `UPDATE documents 
        SET content = $1, version = $2 
        WHERE id = $3 AND owner_id = $4`,
-      [content, version, id, userId]
+      [content, (newVersion), id, userId]
     );
 
     // 5. Success response
     res.status(200).json({
       message: "Document updated successfully",
-      version
+      version : newVersion,
     });
 
   } catch (err) {
