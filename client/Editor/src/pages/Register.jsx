@@ -26,8 +26,8 @@ export default function Login() {
         owner_id : id
       })
 
-      const docId = docData.id
-      navigate(`/editor/${docId}`);
+      //const docId = docData.id
+      navigate(`/editor/${id}`);
     } catch (err) {
       setError(err.message);
     }

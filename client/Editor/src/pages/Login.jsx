@@ -13,15 +13,16 @@ export default function Login() {
     setError("");
 
     try {
-      const data = await apiRequest("/auth/login", "POST", {
+      const data = await apiRequest("/api/auth/login", "POST", {
         email,
         password,
       });
 
       localStorage.setItem("token", data.token);
-
-      // hardcode document id for now
-      navigate("/document/2");
+      const {id} = data.user;
+      //const owner_id = id;
+      //const docData = await apiRequest(`/document/${owner_id}`, "GET")
+      navigate(`/editor/${id}`);
     } catch (err) {
       setError(err.message);
     }

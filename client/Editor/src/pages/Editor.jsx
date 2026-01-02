@@ -7,13 +7,15 @@ export default function Editor() {
 
   const [content, setContent] = useState("");
   const [version, setVersion] = useState(null);
+  const [docId, setDocId] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadDocument() {
       try {
-        const data = await apiRequest(`/document/${id}`,"GET");
+        const data = await apiRequest(`/document/${id}`,"POST");
+        setDocId(data.id);
         setContent(data.content);
         setVersion(data.version);
       } catch (err) {
@@ -28,7 +30,7 @@ export default function Editor() {
     setIsSaving(true);
     setError("");
     try {
-      const data = await apiRequest(`/document/${id}`, "PUT", {
+      const data = await apiRequest(`/document/${docId}`, "PUT", {
         content,
         version,
       });
