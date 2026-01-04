@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const server = require('http')
 const documentRouter = require('./routes/documents');
 const authRouter = require('./routes/authRoute');
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
