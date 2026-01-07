@@ -147,4 +147,4 @@ This project is licensed under the MIT License.
 👨‍💻 Author
 
 Prajjwal Dwivedi
-📌 Full-Stack Developer | Systems & Backend Enthusiast
+📌 Full-Stack Developer | Systems & Backend Enthusiast.
