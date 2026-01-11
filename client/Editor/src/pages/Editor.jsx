@@ -25,11 +25,11 @@ export default function Editor() {
 });
 
     socket.emit("join-document", {
-      documentId: id,
+      ownerId: id,
     });
 
     socket.emit("request-document", {
-      documentId: id,
+      documentId: docId,
     });
     
     return (

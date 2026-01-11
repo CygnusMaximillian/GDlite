@@ -34,7 +34,6 @@ io.use((socket,next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
-    console.log("Id is" , decoded);
     socket.user = { id: decoded.userId, email: decoded.email }; // attach actual user info
     next();
   } catch (err) {
@@ -51,10 +50,9 @@ io.on("connection", (socket) => {
   console.log("Socket ID:", socket.id);
   console.log("User:", socket.user);
 
-  socket.emit("ping", "hello from server");
 
-  socket.on("join_document", ({ documentId }) => {
-    const roomName = `document:${documentId}`;
+  socket.on("join-document", ({ ownerId }) => {
+    const roomName = `owner:${ownerId}`;
     socket.join(roomName);
 
     console.log(`📄 User ${socket.user.id} joined ${roomName}`);
