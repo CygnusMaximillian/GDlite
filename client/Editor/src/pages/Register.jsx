@@ -22,9 +22,9 @@ export default function Login() {
 
       const {id} = data.user;
       console.log("User data is ",data.user , " user id is ", id);
-      const docData = await apiRequest("/document/","POST", {
+      /*const docData = await apiRequest("/document/","POST", {
         owner_id : id
-      })
+      })*/
 
       //const docId = docData.id
       navigate(`/editor/${id}`);
@@ -50,6 +50,8 @@ export default function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
+       
 
         <button type="submit">Register</button>
       </form>

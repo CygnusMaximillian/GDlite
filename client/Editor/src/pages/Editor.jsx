@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "../api";
 import { useParams } from "react-router-dom";
+import {socket} from "../socket.js";
 
 export default function Editor() {
   const { id } = useParams();
@@ -11,10 +12,74 @@ export default function Editor() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
+
+  useEffect(() => {
+
+    socket.auth = {
+      token: localStorage.getItem("token"),
+    }
+    socket.connect();
+
+    socket.on("connect_error", (err) => {
+  console.log("Socket auth error:", err.message);
+});
+
+    socket.emit("join-document", {
+      documentId: id,
+    });
+
+    socket.emit("request-document", {
+      documentId: id,
+    });
+    
+    return (
+      ()=> {
+        socket.disconnect();
+      }
+    )
+  },[id]);
+
+  useEffect(() => {
+    socket.on("document:load", (doc) => {
+      setContent(doc.content);
+      setVersion(doc.version);
+    });
+
+    socket.on("document:sync", ({ content, version }) => {
+      setContent(content);
+      setVersion(version);
+    });
+
+    socket.on("document:reject", (latest) => {
+      setContent(latest.content);
+      setVersion(latest.version);
+    });
+
+    return () => {
+      socket.off("document:load");
+      socket.off("document:sync");
+      socket.off("document:reject");
+    };
+  }, []);
+
+  useEffect(() => {
+    if(!docId) return;
+
+    const timeout = setTimeout(() => {
+      socket.emit("document:update", {
+        documentId: docId,
+        content,
+        version,
+      });
+
+      return () => clearTimeout(timeout);
+    },400);
+  }, [content]);
+
   useEffect(() => {
     async function loadDocument() {
       try {
-        const data = await apiRequest(`/document/${id}`,"POST");
+        const data = await apiRequest(`/document/${id}`,"GET");
         setDocId(data.id);
         setContent(data.content);
         setVersion(data.version);
@@ -62,9 +127,9 @@ export default function Editor() {
 
       <br />
 
-      <button onClick={handleSave} disabled={isSaving}>
+      {/*<button onClick={handleSave} disabled={isSaving}>
         {isSaving ? "Saving..." : "Save"}
-      </button>
+      </button>*/}
 
       {error && <p style={{ color: "red" }}>{error}</p>}
     </div>

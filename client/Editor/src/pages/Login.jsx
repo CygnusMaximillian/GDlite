@@ -6,6 +6,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [userId, setUserId] = useState("");
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -45,6 +46,8 @@ export default function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
+        
 
         <button type="submit">Login</button>
       </form>
