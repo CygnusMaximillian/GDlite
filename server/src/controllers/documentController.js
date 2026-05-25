@@ -2,7 +2,8 @@ const pool = require('../db');
 
 exports.createDocument = async (req , res) => {
   try {
-    const {owner_id} = req.body;
+    // Always use the authenticated user as owner, ignore body owner_id
+    const owner_id = req.user.id;
 
     const result = await pool.query(
       `INSERT INTO documents (owner_id)
@@ -29,11 +30,12 @@ exports.createDocument = async (req , res) => {
 
 exports.getDocumentId = async (req , res) => {
   try{
-    const id = parseInt(req.params.id, 10);
+    const ownerId = parseInt(req.params.id, 10);
     const userId = parseInt(req.user.id, 10);
 
+    // Find the document owned by ownerId
     const result = await pool.query(
-      `SELECT * FROM documents WHERE owner_id = $1` , [id] 
+      `SELECT * FROM documents WHERE owner_id = $1` , [ownerId] 
     );
     
     if (result.rows.length === 0) {
@@ -42,7 +44,7 @@ exports.getDocumentId = async (req , res) => {
 
     const doc = result.rows[0];
 
-    // Check permissions
+    // Check if requesting user has any permission on this document
     const permResult = await pool.query(
       `SELECT role FROM document_permissions WHERE document_id = $1 AND user_id = $2`,
       [doc.id, userId]
@@ -52,7 +54,7 @@ exports.getDocumentId = async (req , res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    doc.role = permResult.rows[0].role; // attach role to response
+    doc.role = permResult.rows[0].role;
     res.json(doc);
 
   }
@@ -117,6 +119,27 @@ exports.updateDocument = async (req, res) => {
 
   } catch (err) {
     console.error("Update error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getSharedDocuments = async (req, res) => {
+  try {
+    const userId = parseInt(req.user.id);
+
+    const result = await pool.query(
+      `SELECT d.*, dp.role, u.email AS owner_email
+       FROM document_permissions dp
+       JOIN documents d ON dp.document_id = d.id
+       JOIN users u ON d.owner_id = u.id
+       WHERE dp.user_id = $1
+       ORDER BY d.created_at DESC`,
+      [userId]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching shared docs:", err);
     res.status(500).json({ message: "Internal server error" });
   }
 };

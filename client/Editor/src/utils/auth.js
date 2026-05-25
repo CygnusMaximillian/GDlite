@@ -4,5 +4,5 @@ export function isAuthenticated(){
 
 export function logout() {
   localStorage.removeItem("token");
-  window.local.href = "/login";
+  window.location.href = "/login";
 }

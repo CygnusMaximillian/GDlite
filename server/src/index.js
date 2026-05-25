@@ -34,7 +34,7 @@ io.use((socket,next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
-    socket.user = { id: decoded.userId, email: decoded.email }; // attach actual user info
+    socket.user = { id: decoded.userId, email: decoded.email };
     next();
   } catch (err) {
     return next(new Error("Authentication error"));
