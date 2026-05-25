@@ -30,7 +30,7 @@ const register = async (req, res) => {
 
     // 4. Create identity token (ONLY identity, no secrets)
     const token = jwt.sign(
-      { userId: user.id },
+      { userId: user.id, email: user.email },
       process.env.PRIVATE_KEY,
       { expiresIn: '10h' }
     );
@@ -65,7 +65,7 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user.id },
+      { userId: user.id, email: user.email },
       process.env.PRIVATE_KEY,
       { expiresIn: '10h' }
     );
