@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const {Server} = require('socket.io');
 const documentRouter = require('./routes/documents');
 const authRouter = require('./routes/authRoute');
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
 
 const app = express();
 const server = http.createServer(app);
@@ -46,20 +46,45 @@ io.on("connect_error", (err) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("✅ Socket connected");
-  console.log("Socket ID:", socket.id);
-  console.log("User:", socket.user);
+  console.log("✅ Socket connected:", socket.id, "User:", socket.user);
 
+  let currentRoom = null;
 
   socket.on("join-document", ({ ownerId }) => {
+    if (currentRoom) {
+      socket.leave(currentRoom);
+    }
     const roomName = `owner:${ownerId}`;
     socket.join(roomName);
+    currentRoom = roomName;
 
     console.log(`📄 User ${socket.user.id} joined ${roomName}`);
+    
+    // Notify others that a user joined
+    socket.to(roomName).emit("user-joined", socket.user);
+  });
+
+  socket.on("document:update", (data) => {
+    if (currentRoom) {
+      socket.to(currentRoom).emit("document:sync", data);
+    }
+  });
+
+  socket.on("cursor-move", (position) => {
+    if (currentRoom) {
+      socket.to(currentRoom).emit("cursor-update", { 
+        userId: socket.user.id, 
+        email: socket.user.email, 
+        position 
+      });
+    }
   });
 
   socket.on("disconnect", () => {
     console.log("❌ Socket disconnected:", socket.id);
+    if (currentRoom) {
+      socket.to(currentRoom).emit("user-left", socket.user.id);
+    }
   });
 });
 
