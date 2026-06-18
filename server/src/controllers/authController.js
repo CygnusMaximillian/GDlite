@@ -1,7 +1,6 @@
 const pool = require('../db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
 const register = async (req, res) => {
   try {

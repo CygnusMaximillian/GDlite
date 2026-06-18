@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
-const pool = require('../db')
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+const pool = require('../db');
 
 const auth = async (req, res, next) => {
   // 1️⃣ Get the Authorization header

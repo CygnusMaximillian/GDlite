@@ -1,10 +1,7 @@
 const {Pool} = require('pg');
 
-require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
-
-
 const pool = new Pool({
-  connectionString : process.env.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL,
 });
 
 pool.query('SELECT NOW()', async (err, res) => {
