@@ -80,6 +80,14 @@ io.on("connection", (socket) => {
     }
   });
 
+  // Latency test relay — used by latency-test.js only
+  socket.on("latency:ping", (data) => {
+    if (currentRoom) socket.to(currentRoom).emit("latency:ping", data);
+  });
+  socket.on("latency:pong", (data) => {
+    if (currentRoom) socket.to(currentRoom).emit("latency:pong", data);
+  });
+
   socket.on("disconnect", () => {
     console.log("❌ Socket disconnected:", socket.id);
     if (currentRoom) {
