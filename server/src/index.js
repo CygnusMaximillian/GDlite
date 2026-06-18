@@ -9,17 +9,27 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env'
 
 const app = express();
 const server = http.createServer(app);
-app.use(cors());
+
+// Support comma-separated origins: "https://gdlite.vercel.app,http://localhost:5173"
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',').map(o => o.trim())
+  : ['http://localhost:5173'];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+
 app.use(express.json());
-app.use('/document' , documentRouter);
-app.use('/api/auth' , authRouter);
-app.get('/document' , () => {
-  console.log('Server is running');
-} );
+app.use('/document', documentRouter);
+app.use('/api/auth', authRouter);
+
+// Health check — used by Render health checks and UptimeRobot keep-alive pings
+app.get('/health', (req, res) => res.json({ status: 'ok', ts: Date.now() }));
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     credentials: true,
   },
   transports: ["websocket", "polling"],
