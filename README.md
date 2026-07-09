@@ -30,7 +30,7 @@ PostgreSQL
 
 pg (node-postgres)
 
-dotenv
+dotenv and
 
 JWT Authentication
 
